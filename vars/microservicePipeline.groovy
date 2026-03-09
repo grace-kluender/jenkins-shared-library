@@ -3,12 +3,16 @@ def call(Map config = [:]) {
     pipeline {
         agent any
 
-        environment {
-            DOCKER_IMAGE = config.image
-            DOCKER_TAG = "${env.BUILD_NUMBER}"
-        }
-
         stages {
+
+            stage('Initialize') {
+                steps {
+                    script {
+                        env.DOCKER_IMAGE = config.image
+                        env.DOCKER_TAG = env.BUILD_NUMBER
+                    }
+                }
+            }
 
             stage('Build') {
                 steps {
@@ -32,13 +36,13 @@ def call(Map config = [:]) {
 
             stage('Container Build') {
                 steps {
-                    sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                    sh "docker build -t ${env.DOCKER_IMAGE}:${env.DOCKER_TAG} ."
                 }
             }
 
             stage('Security Scan') {
                 steps {
-                    sh "docker scout cves ${DOCKER_IMAGE}:${DOCKER_TAG} || true"
+                    sh "docker scout cves ${env.DOCKER_IMAGE}:${env.DOCKER_TAG} || true"
                 }
             }
 
@@ -47,7 +51,7 @@ def call(Map config = [:]) {
                     anyOf {
                         branch 'develop'
                         branch 'main'
-                        expression { env.BRANCH_NAME.startsWith('release') }
+                        expression { env.BRANCH_NAME.startsWith('release/') }
                     }
                 }
 
@@ -68,12 +72,16 @@ def call(Map config = [:]) {
 
             stage('Deploy Dev') {
                 when { branch 'develop' }
-                steps { echo "Deploying to Dev" }
+                steps {
+                    echo "Deploying to Dev"
+                }
             }
 
             stage('Deploy Staging') {
-                when { expression { env.BRANCH_NAME.startsWith('release') } }
-                steps { echo "Deploying to Staging" }
+                when { expression { env.BRANCH_NAME.startsWith('release/') } }
+                steps {
+                    echo "Deploying to Staging"
+                }
             }
 
             stage('Deploy Production') {
