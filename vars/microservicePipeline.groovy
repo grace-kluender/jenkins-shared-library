@@ -84,14 +84,7 @@ def call(Map config = [:]) {
             stage('Deploy Dev') {
                 when { branch 'develop' }
                 steps {
-                    sh """
-                    docker run --rm \
-                    -v /Users/gracekluender/.kube:/root/.kube \
-                    -v /Users/gracekluender/.minikube:/root/.minikube \
-                    -v \$PWD/ecommerce-infrastructure:/workspace \
-                    bitnami/kubectl:latest \
-                    apply -f /workspace/k8s/${SERVICE_NAME} -n dev
-                    """
+                    sh "kubectl apply -f ecommerce-infrastructure/k8s/${SERVICE_NAME} -n dev"
                     echo "Deploying to Dev"
                 }
             }
@@ -99,30 +92,15 @@ def call(Map config = [:]) {
             stage('Deploy Staging') {
                 when { expression { env.BRANCH_NAME.startsWith('release/') } }
                 steps {
-                    sh """
-                    docker run --rm \
-                    -v /Users/gracekluender/.kube:/root/.kube \
-                    -v /Users/gracekluender/.minikube:/root/.minikube \
-                    -v \$PWD/ecommerce-infrastructure:/workspace \
-                    bitnami/kubectl:latest \
-                    apply -f /workspace/k8s/${SERVICE_NAME} -n staging
-                    """
-                    echo "Deploying to Staging"
+                    sh "kubectl apply -f ecommerce-infrastructure/k8s/${SERVICE_NAME} -n staging"
                 }
             }
+
             stage('Deploy Production') {
                 when { branch 'main' }
                 steps {
                     input "Approve production deployment?"
-                    sh """
-                    docker run --rm \
-                    -v /Users/gracekluender/.kube:/root/.kube \
-                    -v /Users/gracekluender/.minikube:/root/.minikube \
-                    -v \$PWD/ecommerce-infrastructure:/workspace \
-                    bitnami/kubectl:latest \
-                    apply -f /workspace/k8s/${SERVICE_NAME} -n prod
-                    """
-                    echo "Deploying to Production"
+                    sh "kubectl apply -f ecommerce-infrastructure/k8s/${SERVICE_NAME} -n prod"
                 }
             }
 
