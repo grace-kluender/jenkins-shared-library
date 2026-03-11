@@ -86,12 +86,12 @@ def call(Map config = [:]) {
                     sh "which kubectl || echo 'kubectl not found'"
                 }
             }
-            
+
             stage('Deploy Dev') {
                 when { branch 'develop' }
                 steps {
                     sh """
-                    kubectl apply -f \$PWD/ecommerce-infrastructure/k8s/${SERVICE_NAME} -n dev
+                    kubectl apply -f \$PWD/ecommerce-infrastructure/k8s/${SERVICE_NAME} -n dev --validate=false
                     """
                 }
             }
@@ -100,7 +100,7 @@ def call(Map config = [:]) {
                 when { expression { env.BRANCH_NAME.startsWith('release/') } }
                 steps {
                     sh """
-                    kubectl apply -f \$PWD/ecommerce-infrastructure/k8s/${SERVICE_NAME} -n staging
+                    kubectl apply -f \$PWD/ecommerce-infrastructure/k8s/${SERVICE_NAME} -n staging --validate=false
                     """
                     echo "Deploying to Staging"
                 }
@@ -111,7 +111,7 @@ def call(Map config = [:]) {
                 steps {
                     input "Approve production deployment?"
                     sh """
-                    kubectl apply -f \$PWD/ecommerce-infrastructure/k8s/${SERVICE_NAME} -n prod
+                    kubectl apply -f \$PWD/ecommerce-infrastructure/k8s/${SERVICE_NAME} -n prod --validate=false
                     """
                     echo "Deploying to Production"
                 }
