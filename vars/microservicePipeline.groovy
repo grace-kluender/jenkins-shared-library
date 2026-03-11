@@ -81,11 +81,17 @@ def call(Map config = [:]) {
                 }
             }
 
-
             stage('Deploy Dev') {
                 when { branch 'develop' }
                 steps {
-                    sh "kubectl apply -f ecommerce-infrastructure/k8s/${SERVICE_NAME} -n dev"
+                    sh """
+                    docker run --rm \
+                    -v \$HOME/.kube:/root/.kube \
+                    -v \$HOME/.minikube:/root/.minikube \
+                    -v \$PWD/ecommerce-infrastructure:/workspace \
+                    bitnami/kubectl:latest \
+                    kubectl apply -f /workspace/k8s/${SERVICE_NAME} -n dev
+                    """
                     echo "Deploying to Dev"
                 }
             }
@@ -93,7 +99,14 @@ def call(Map config = [:]) {
             stage('Deploy Staging') {
                 when { expression { env.BRANCH_NAME.startsWith('release/') } }
                 steps {
-                    sh "kubectl apply -f k8s/${SERVICE_NAME} -n staging"
+                    sh """
+                    docker run --rm \
+                    -v \$HOME/.kube:/root/.kube \
+                    -v \$HOME/.minikube:/root/.minikube \
+                    -v \$PWD/ecommerce-infrastructure:/workspace \
+                    bitnami/kubectl:latest \
+                    kubectl apply -f /workspace/k8s/${SERVICE_NAME} -n staging
+                    """
                     echo "Deploying to Staging"
                 }
             }
@@ -102,7 +115,14 @@ def call(Map config = [:]) {
                 when { branch 'main' }
                 steps {
                     input "Approve production deployment?"
-                    sh "kubectl apply -f k8s/${SERVICE_NAME} -n prod"
+                    sh """
+                    docker run --rm \
+                    -v \$HOME/.kube:/root/.kube \
+                    -v \$HOME/.minikube:/root/.minikube \
+                    -v \$PWD/ecommerce-infrastructure:/workspace \
+                    bitnami/kubectl:latest \
+                    kubectl apply -f /workspace/k8s/${SERVICE_NAME} -n prod
+                    """
                     echo "Deploying to Production"
                 }
             }
@@ -111,11 +131,11 @@ def call(Map config = [:]) {
                 steps {
                     sh """
                     cd ecommerce-infrastructure
-                    sh git checkout -- k8s/${SERVICE_NAME}/deployment.yaml || true
+                    git checkout -- k8s/${SERVICE_NAME}/deployment.yaml || true
                     """
                 }
             }
+
         }
     }
-
 }
