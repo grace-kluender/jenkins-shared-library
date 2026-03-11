@@ -74,8 +74,9 @@ def call(Map config = [:]) {
             stage('Update Kubernetes Manifest') {
                 steps {
                     sh """
+                    rm -rf ecommerce-infrastructure
                     git clone https://github.com/grace-kluender/ecommerce-infrastructure.git
-                    sed -i 's|IMAGE_TAG|${DOCKER_TAG}|g' k8s/${SERVICE_NAME}/deployment.yaml
+                    sed -i 's|IMAGE_TAG|${DOCKER_TAG}|g' ecommerce-infrastructure/k8s/${SERVICE_NAME}/deployment.yaml
                     """
                 }
             }
