@@ -85,13 +85,13 @@ def call(Map config = [:]) {
                 when { branch 'develop' }
                 steps {
                     sh """
-                    docker run --rm \
-                    --network host \
-                    -v \$PWD:/workspace \
-                    -v /Users/gracekluender/.kube:/root/.kube \
-                    -v /Users/gracekluender/.minikube:/root/.minikube \
-                    bitnami/kubectl:latest \
-                    apply -f /workspace/ecommerce-infrastructure/k8s/${SERVICE_NAME} -n dev
+                    docker run --rm \\
+                    --network host \\
+                    -v \$PWD/ecommerce-infrastructure:/workspace \\
+                    -v /Users/gracekluender/.kube:/root/.kube \\
+                    -v /Users/gracekluender/.minikube:/root/.minikube \\
+                    bitnami/kubectl:latest \\
+                    apply -f /workspace/k8s/${SERVICE_NAME} -n dev
                     """
                 }
             }
@@ -100,13 +100,13 @@ def call(Map config = [:]) {
                 when { expression { env.BRANCH_NAME.startsWith('release/') } }
                 steps {
                     sh """
-                    docker run --rm \
-                    --network host \
-                    -v \$PWD:/workspace \
-                    -v /Users/gracekluender/.kube:/root/.kube \
-                    -v /Users/gracekluender/.minikube:/root/.minikube \
-                    bitnami/kubectl:latest \
-                    apply -f /workspace/ecommerce-infrastructure/k8s/${SERVICE_NAME} -n staging
+                    docker run --rm \\
+                    --network host \\
+                    -v \$PWD/ecommerce-infrastructure:/workspace \\
+                    -v /Users/gracekluender/.kube:/root/.kube \\
+                    -v /Users/gracekluender/.minikube:/root/.minikube \\
+                    bitnami/kubectl:latest \\
+                    apply -f /workspace/k8s/${SERVICE_NAME} -n staging
                     """
                     echo "Deploying to Staging"
                 }
@@ -117,13 +117,13 @@ def call(Map config = [:]) {
                 steps {
                     input "Approve production deployment?"
                     sh """
-                    docker run --rm \
-                    --network host \
-                    -v \$PWD:/workspace \
-                    -v /Users/gracekluender/.kube:/root/.kube \
-                    -v /Users/gracekluender/.minikube:/root/.minikube \
-                    bitnami/kubectl:latest \
-                    apply -f /workspace/ecommerce-infrastructure/k8s/${SERVICE_NAME} -n prod
+                    docker run --rm \\
+                    --network host \\
+                    -v \$PWD/ecommerce-infrastructure:/workspace \\
+                    -v /Users/gracekluender/.kube:/root/.kube \\
+                    -v /Users/gracekluender/.minikube:/root/.minikube \\
+                    bitnami/kubectl:latest \\
+                    apply -f /workspace/k8s/${SERVICE_NAME} -n prod
                     """
                     echo "Deploying to Production"
                 }
