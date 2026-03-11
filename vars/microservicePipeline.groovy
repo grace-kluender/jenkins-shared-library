@@ -84,23 +84,47 @@ def call(Map config = [:]) {
             stage('Deploy Dev') {
                 when { branch 'develop' }
                 steps {
-                    sh "kubectl apply -f ecommerce-infrastructure/k8s/${SERVICE_NAME} -n dev"
-                    echo "Deploying to Dev"
+                    sh """
+                    docker run --rm \
+                    --network host \
+                    -v \$PWD:/workspace \
+                    -v \$HOME/.kube:/root/.kube \
+                    -v \$HOME/.minikube:/root/.minikube \
+                    bitnami/kubectl:latest \
+                    apply -f /workspace/ecommerce-infrastructure/k8s/${SERVICE_NAME} -n dev
+                    """
                 }
             }
 
             stage('Deploy Staging') {
                 when { expression { env.BRANCH_NAME.startsWith('release/') } }
                 steps {
-                    sh "kubectl apply -f ecommerce-infrastructure/k8s/${SERVICE_NAME} -n staging"
+                    sh """
+                    docker run --rm \
+                    --network host \
+                    -v \$PWD:/workspace \
+                    -v \$HOME/.kube:/root/.kube \
+                    -v \$HOME/.minikube:/root/.minikube \
+                    bitnami/kubectl:latest \
+                    apply -f /workspace/ecommerce-infrastructure/k8s/${SERVICE_NAME} -n staging
+                    """
+                    echo "Deploying to Staging"
                 }
             }
 
-            stage('Deploy Production') {
-                when { branch 'main' }
+            stage('Deploy Staging') {
+                when { expression { env.BRANCH_NAME.startsWith('release/') } }
                 steps {
-                    input "Approve production deployment?"
-                    sh "kubectl apply -f ecommerce-infrastructure/k8s/${SERVICE_NAME} -n prod"
+                    sh """
+                    docker run --rm \
+                    --network host \
+                    -v \$PWD:/workspace \
+                    -v \$HOME/.kube:/root/.kube \
+                    -v \$HOME/.minikube:/root/.minikube \
+                    bitnami/kubectl:latest \
+                    apply -f /workspace/ecommerce-infrastructure/k8s/${SERVICE_NAME} -n staging
+                    """
+                    echo "Deploying to Staging"
                 }
             }
 
