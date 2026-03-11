@@ -43,7 +43,7 @@ def call(Map config = [:]) {
 
             stage('Security Scan') {
                 steps {
-                    sh "docker scout cves ${env.DOCKER_IMAGE}:${env.DOCKER_TAG} || true"
+                    sh "trivy image --exit-code 0 --severity HIGH,CRITICAL ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
                 }
             }
 
@@ -80,7 +80,7 @@ def call(Map config = [:]) {
                     """
                 }
             }
-            
+
             stage('Deploy Dev') {
                 when { branch 'develop' }
                 steps {
