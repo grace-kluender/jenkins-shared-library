@@ -80,13 +80,7 @@ def call(Map config = [:]) {
                     """
                 }
             }
-
-            stage('Debug') {
-                steps {
-                    sh "which kubectl || echo 'kubectl not found'"
-                }
-            }
-
+            
             stage('Deploy Dev') {
                 when { branch 'develop' }
                 steps {
