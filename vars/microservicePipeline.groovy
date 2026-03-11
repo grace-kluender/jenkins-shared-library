@@ -88,8 +88,8 @@ def call(Map config = [:]) {
                     docker run --rm \
                     --network host \
                     -v \$PWD:/workspace \
-                    -v /Users/$USER/.kube:/root/.kube \
-                    -v /Users/$USER/.minikube:/root/.minikube \
+                    -v /Users/gracekluender/.kube:/root/.kube \
+                    -v /Users/gracekluender/.minikube:/root/.minikube \
                     bitnami/kubectl:latest \
                     apply -f /workspace/ecommerce-infrastructure/k8s/${SERVICE_NAME} -n dev
                     """
@@ -103,8 +103,8 @@ def call(Map config = [:]) {
                     docker run --rm \
                     --network host \
                     -v \$PWD:/workspace \
-                    -v /Users/$USER/.kube:/root/.kube \
-                    -v /Users/$USER/.minikube:/root/.minikube \
+                    -v /Users/gracekluender/.kube:/root/.kube \
+                    -v /Users/gracekluender/.minikube:/root/.minikube \
                     bitnami/kubectl:latest \
                     apply -f /workspace/ecommerce-infrastructure/k8s/${SERVICE_NAME} -n staging
                     """
@@ -120,8 +120,8 @@ def call(Map config = [:]) {
                     docker run --rm \
                     --network host \
                     -v \$PWD:/workspace \
-                    -v /Users/$USER/.kube:/root/.kube \
-                    -v /Users/$USER/.minikube:/root/.minikube \
+                    -v /Users/gracekluender/.kube:/root/.kube \
+                    -v /Users/gracekluender/.minikube:/root/.minikube \
                     bitnami/kubectl:latest \
                     apply -f /workspace/ecommerce-infrastructure/k8s/${SERVICE_NAME} -n prod
                     """
