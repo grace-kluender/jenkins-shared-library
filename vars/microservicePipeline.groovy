@@ -10,6 +10,7 @@ def call(Map config = [:]) {
                     script {
                         env.DOCKER_IMAGE = config.image
                         env.DOCKER_TAG = env.BUILD_NUMBER
+                        env.SERVICE_NAME = config.image.tokenize('/')[1]
                     }
                 }
             }
@@ -70,9 +71,19 @@ def call(Map config = [:]) {
                 }
             }
 
+            stage('Update Kubernetes Manifest') {
+                steps {
+                    sh """
+                    sed -i 's|IMAGE_TAG|${DOCKER_TAG}|g' k8s/${SERVICE_NAME}/deployment.yaml
+                    """
+                }
+            }
+
+
             stage('Deploy Dev') {
                 when { branch 'develop' }
                 steps {
+                    sh "kubectl apply -f k8s/${SERVICE_NAME} -n dev"
                     echo "Deploying to Dev"
                 }
             }
@@ -80,6 +91,7 @@ def call(Map config = [:]) {
             stage('Deploy Staging') {
                 when { expression { env.BRANCH_NAME.startsWith('release/') } }
                 steps {
+                    sh "kubectl apply -f k8s/${SERVICE_NAME} -n staging"
                     echo "Deploying to Staging"
                 }
             }
@@ -88,10 +100,16 @@ def call(Map config = [:]) {
                 when { branch 'main' }
                 steps {
                     input "Approve production deployment?"
+                    sh "kubectl apply -f k8s/${SERVICE_NAME} -n prod"
                     echo "Deploying to Production"
                 }
             }
 
+            stage('Reset Manifest') {
+                steps {
+                    sh "git checkout -- k8s/${SERVICE_NAME}/deployment.yaml || true"
+                }
+            }
         }
     }
 
