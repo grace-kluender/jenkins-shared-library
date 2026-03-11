@@ -90,7 +90,7 @@ def call(Map config = [:]) {
                     -v /Users/gracekluender/.minikube:/root/.minikube \
                     -v \$PWD/ecommerce-infrastructure:/workspace \
                     bitnami/kubectl:latest \
-                    kubectl apply -f /workspace/k8s/${SERVICE_NAME} -n dev
+                    apply -f /workspace/k8s/${SERVICE_NAME} -n dev
                     """
                     echo "Deploying to Dev"
                 }
@@ -105,7 +105,7 @@ def call(Map config = [:]) {
                     -v /Users/gracekluender/.minikube:/root/.minikube \
                     -v \$PWD/ecommerce-infrastructure:/workspace \
                     bitnami/kubectl:latest \
-                    kubectl apply -f /workspace/k8s/${SERVICE_NAME} -n staging
+                    apply -f /workspace/k8s/${SERVICE_NAME} -n staging
                     """
                     echo "Deploying to Staging"
                 }
@@ -120,7 +120,7 @@ def call(Map config = [:]) {
                     -v /Users/gracekluender/.minikube:/root/.minikube \
                     -v \$PWD/ecommerce-infrastructure:/workspace \
                     bitnami/kubectl:latest \
-                    kubectl apply -f /workspace/k8s/${SERVICE_NAME} -n prod
+                    apply -f /workspace/k8s/${SERVICE_NAME} -n prod
                     """
                     echo "Deploying to Production"
                 }
