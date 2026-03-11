@@ -81,6 +81,12 @@ def call(Map config = [:]) {
                 }
             }
 
+            stage('Debug') {
+                steps {
+                    sh "find \$PWD/ecommerce-infrastructure -type f"
+                }
+            }
+
             stage('Deploy Dev') {
                 when { branch 'develop' }
                 steps {
