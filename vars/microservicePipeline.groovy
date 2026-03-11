@@ -112,9 +112,10 @@ def call(Map config = [:]) {
                 }
             }
 
-            stage('Deploy Staging') {
-                when { expression { env.BRANCH_NAME.startsWith('release/') } }
+            stage('Deploy Production') {
+                when { branch 'main' }
                 steps {
+                    input "Approve production deployment?"
                     sh """
                     docker run --rm \
                     --network host \
@@ -122,9 +123,9 @@ def call(Map config = [:]) {
                     -v \$HOME/.kube:/root/.kube \
                     -v \$HOME/.minikube:/root/.minikube \
                     bitnami/kubectl:latest \
-                    apply -f /workspace/ecommerce-infrastructure/k8s/${SERVICE_NAME} -n staging
+                    apply -f /workspace/ecommerce-infrastructure/k8s/${SERVICE_NAME} -n prod
                     """
-                    echo "Deploying to Staging"
+                    echo "Deploying to Production"
                 }
             }
 
