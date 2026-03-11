@@ -74,6 +74,7 @@ def call(Map config = [:]) {
             stage('Update Kubernetes Manifest') {
                 steps {
                     sh """
+                    git clone https://github.com/grace-kluender/ecommerce-infrastructure.git
                     sed -i 's|IMAGE_TAG|${DOCKER_TAG}|g' k8s/${SERVICE_NAME}/deployment.yaml
                     """
                 }
@@ -83,7 +84,7 @@ def call(Map config = [:]) {
             stage('Deploy Dev') {
                 when { branch 'develop' }
                 steps {
-                    sh "kubectl apply -f k8s/${SERVICE_NAME} -n dev"
+                    sh "kubectl apply -f ecommerce-infrastructure/k8s/${SERVICE_NAME} -n dev"
                     echo "Deploying to Dev"
                 }
             }
@@ -107,7 +108,10 @@ def call(Map config = [:]) {
 
             stage('Reset Manifest') {
                 steps {
-                    sh "git checkout -- k8s/${SERVICE_NAME}/deployment.yaml || true"
+                    sh """
+                    cd ecommerce-infrastructure
+                    sh git checkout -- k8s/${SERVICE_NAME}/deployment.yaml || true
+                    """
                 }
             }
         }
